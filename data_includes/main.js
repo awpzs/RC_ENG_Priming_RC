@@ -211,7 +211,7 @@ Template(
                 .add(350, 175, getImage("7") )
                 .add(525, 175, getImage("8") )
                 .add(40, 355, getText("production"))
-                .add(300, 425, getButton("proc"))
+                .add(300, 455, getButton("proc"))
                 .print()
             ,
             newSelector()
