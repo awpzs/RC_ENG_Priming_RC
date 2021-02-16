@@ -262,7 +262,7 @@ Template(
                             .settings.after(newText("."))
                             .print()
                         ,
-                        newText("But avoid mentioning the location (e.g., ").bold()
+                        newText("But avoid mentioning the location ").bold()
                             .settings.after(newText("(e.g., "))
                             .settings.after(newText(variable.targetSP))
                             .settings.after(newText(")."))
