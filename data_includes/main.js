@@ -128,7 +128,7 @@ Template(
             getText("prac_item").test.text("p1")
             	.success(newText("In every trial, you’ll see a display of 8 objects. Here you’ve just heard&nbsp;")
                 	.settings.after(newText("&ldquo;"))
-                	.settings.after(newText("prime_description", variable.prime_description).settings.center())
+                	.settings.after(newText("prime_description", variable.prime_description).bold().settings.center())
                 	.settings.after(newText("&#8221;."))
                 	.settings.center()
                 	.print()            
@@ -210,7 +210,7 @@ Template(
                 .add(175, 175, getImage("6") )
                 .add(350, 175, getImage("7") )
                 .add(525, 175, getImage("8") )
-                .add(175, 355, getText("production"))
+                .add(40, 355, getText("production"))
                 .add(300, 425, getButton("proc"))
                 .print()
             ,
