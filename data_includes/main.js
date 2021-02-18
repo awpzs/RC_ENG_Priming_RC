@@ -4,6 +4,7 @@ var showProgressBar = false;
 PennController.AddHost("https://raw.githubusercontent.com/awpzs/RC_ENG_Priming_RC/master/audio/")
 PennController.AddHost("https://raw.githubusercontent.com/awpzs/RC_ENG_Priming_RC/master/images/")
 
+//Sequence( "initRecorder", "exp_start", "exp_block1", "rest", "exp_block2", "final" ) //for checking lists only
 Sequence( "setcounter", "information", "survey", "identification", "recording_information", "initRecorder", "instruction", "prac", "exp_start", "exp_block1", "rest", "exp_block2", "send", "final" )
 
 PennController.SetCounter( "setcounter" )
@@ -70,14 +71,15 @@ Template(
     GetTable("instructions.csv")
             .setGroupColumn("list")//.filter( variable => variable.list == 3 ) 
             , variable =>
-    newTrial( "instruction" ,
-        newHtml("information", variable.insPage)
-            .print()
-        ,
-        newButton("Continue")
-            .settings.center()
-            .print()
-            .wait()
+            newTrial( "instruction" ,
+                newHtml("information", variable.insPage)
+                    .print()
+            ,
+            newButton("Continue")
+                .settings.center()
+                .print()
+                .wait(getHtml("information").test.complete()
+                    .failure(getHtml("information").warn()))
   )
   .log( "ID"     , GetURLParameter("id")    )
 )
@@ -211,7 +213,7 @@ Template(
                 .add(350, 175, getImage("7") )
                 .add(525, 175, getImage("8") )
                 .add(40, 355, getText("production"))
-                .add(300, 455, getButton("proc"))
+                .add(325, 455, getButton("proc"))
                 .print()
             ,
             newSelector()
