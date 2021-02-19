@@ -1,11 +1,56 @@
 PennController.ResetPrefix(null) // Shorten command names (keep this line here)
 var showProgressBar = false;
-//PennController.DebugOff()
+PennController.DebugOff()
 PennController.AddHost("https://raw.githubusercontent.com/awpzs/RC_ENG_Priming_RC/master/audio/")
 PennController.AddHost("https://raw.githubusercontent.com/awpzs/RC_ENG_Priming_RC/master/images/")
 
+//Sequence( "initRecorder", "mic_check", "prac" ) //for checking prac only
 //Sequence( "initRecorder", "exp_start", "exp_block1", "rest", "exp_block2", "final" ) //for checking lists only
-Sequence( "setcounter", "information", "survey", "identification", "recording_information", "initRecorder", "instruction", "prac", "exp_start", "exp_block1", "rest", "exp_block2", "send", "final" )
+Sequence( "initRecorder", "mic_check", "setcounter", "information", "survey", "identification", "recording_information", "instruction", "prac", "exp_start", "exp_block1", "rest", "exp_block2", "send", "final" )
+
+//InitiateRecorder("https://localhost/pcibex/index.php", "This experiment involves audio recording. Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
+InitiateRecorder("https://langprolab.stir.ac.uk/pcibex/index.php", "This experiment involves audio recording. Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
+
+newTrial("mic_check",
+    newMediaRecorder("recorder", "audio")
+        .record()
+    ,
+    newText("<p>Before starting, could we please check if we can record your responses?  Please name this image:</p>")
+        .settings.center()
+        .print()
+    ,
+    newImage("apple", "apple.png")
+        .settings.center()
+        .print()
+    ,
+    newText("<p>When you finished naming the image, please click on <strong>Continue</strong> to proceed.</p>")
+        .settings.center()
+        .print()
+    ,
+    newButton("Continue")
+        .settings.center()
+        .print()
+        .wait()
+    ,
+    getMediaRecorder("recorder")
+        .stop()
+        .play()
+        .wait("playback")
+    ,
+    clear()
+    ,
+    newText("<p>You should have heard what you've just said.</p><p>If you haven’t been able to hear what you said, then we are not able to record your responses.</p><p>Please could you close this page now and thank you very much for your interest in this study.</p>")
+        .print()
+    ,
+    newText("<p>If your microphone is working well, please click on <strong>Continue</strong> to proceed.</p>")
+        .print()
+    ,
+    newButton("Continue")
+        .settings.center()
+        .print()
+        .wait()
+)
+.log( "ID", PennController.GetURLParameter("id") )
 
 PennController.SetCounter( "setcounter" )
 
@@ -63,9 +108,6 @@ newTrial("recording_information" ,
         .print()
         .wait()    
 )
-
-InitiateRecorder("https://localhost/pcibex/index.php", "Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
-//InitiateRecorder("https://langprolab.stir.ac.uk/pcibex/index.php", "Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
 
 Template(
     GetTable("instructions.csv")
@@ -225,8 +267,13 @@ Template(
                 .start()
                 .wait()
             ,
-            getMediaRecorder("recorder")
-                .stop()
+            getText("prac_item").test.text("p1")
+                .success(getMediaRecorder("recorder")
+                            .stop()
+                            .play()
+                            .wait("playback"))
+                .failure(getMediaRecorder("recorder")
+                            .stop())
             ,
             getMediaRecorder("recorder").test.recorded()
                 .failure(newText("Sorry, there seems to be something wrong with your microphone. Please stop the experiment, and contact the researcher.").settings.center().print())
@@ -234,25 +281,28 @@ Template(
             clear()
             ,
             getText("prac_item").test.text("p1")
-                .success(newText("You may say ")
-                            .settings.after(newText(variable.targetRC1).bold())
-                            .settings.after(newText(",&nbsp;"))
-                            .settings.after(newText(variable.targetRC2).bold())
-                            .settings.after(newText(",&nbsp;"))
-                            .settings.after(newText(variable.targetPC).bold())
-                            .settings.after(newText("&nbsp;or&nbsp;"))
-                            .settings.after(newText(variable.targetCP).bold())
-                            .settings.after(newText("."))
-                            .print()
-                        ,
-                        newText("But avoid mentioning the location ").bold()
-                            .settings.after(newText("(e.g., "))
-                            .settings.after(newText(variable.targetSP))
-                            .settings.after(newText(")."))
-                            .print()
-                        ,
-                        newText("The objects may be positioned differently for your listener.")
-                            .print())
+                .success(newText("You should have heard what you said - if you haven’t, then please terminate your participation by closing the browser, as we cannot record your responses and your participation will be invalid.")
+                                .print()
+                            ,
+                            newText("When describing the object in the box, you may say ")
+                                .settings.after(newText(variable.targetRC1).bold())
+                                .settings.after(newText(",&nbsp;"))
+                                .settings.after(newText(variable.targetRC2).bold())
+                                .settings.after(newText(",&nbsp;"))
+                                .settings.after(newText(variable.targetPC).bold())
+                                .settings.after(newText("&nbsp;or&nbsp;"))
+                                .settings.after(newText(variable.targetCP).bold())
+                                .settings.after(newText("."))
+                                .print()
+                            ,
+                            newText("But avoid mentioning the location ").bold()
+                                .settings.after(newText("(e.g., "))
+                                .settings.after(newText(variable.targetSP))
+                                .settings.after(newText(")."))
+                                .print()
+                            ,
+                            newText("The objects may be positioned differently for your listener.")
+                                .print())
                 .failure(newText("As before, you may say ")
                             .settings.after(newText(variable.targetRC1).bold())
                             .settings.after(newText(",&nbsp;"))
@@ -263,15 +313,15 @@ Template(
                             .settings.after(newText(variable.targetCP).bold())
                             .settings.after(newText("."))
                             .print()
-                        ,
-                        newText("But avoid mentioning the location ").bold()
-                            .settings.after(newText("(e.g., "))
-                            .settings.after(newText(variable.targetSP))
-                            .settings.after(newText(")."))
-                            .print()
-                        ,
-                        newText("The objects may be arranged differently for your listener.")
-                            .print())
+                            ,
+                            newText("But avoid mentioning the location ").bold()
+                                .settings.after(newText("(e.g., "))
+                                .settings.after(newText(variable.targetSP))
+                                .settings.after(newText(")."))
+                                .print()
+                            ,
+                            newText("The objects may be arranged differently for your listener.")
+                                .print())
             ,
             newButton("Continue")
                 .settings.center()
@@ -280,17 +330,6 @@ Template(
     )
   .log( "ID", GetURLParameter("id")    )
 )
-
-newTrial( "exp_start" ,
-    newText("<p>Now the experiment begins.</p>")
-        .print()
-    ,
-    newButton("Continue")
-        .settings.center()
-        .print()
-        .wait()
-)
-.log( "ID" , GetURLParameter("id") )
 
 Template(
     GetTable("fulldesign.csv")
@@ -604,7 +643,7 @@ newTrial( "final" ,
     newText("<p>If you were asked to download a copy of the recordings on the last page, please send the file and your Prolific ID to <strong>kumiko.fukumura[at]stir.ac.uk.</strong></p><p>Otherwise, please click on the link below to validate your participation.</p>")
         .print()
     ,
-    newText("<p><a href='https://stirling.sona-systems.com/webstudy_credit.aspx?experiment_id=1925&credit_token=fc3d22db136244e586055231fd4817bd&survey_code="+GetURLParameter("id")+"'>Click here to validate your participation and finish the experiment</a></p>")
+    newText("<p><a href='https://app.prolific.co/submissions/complete?cc=520E9FBA'>Click here to validate your participation and finish the experiment</a></p>")
         .settings.center()
         .print()
     ,
