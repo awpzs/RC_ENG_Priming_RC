@@ -4,12 +4,12 @@ PennController.DebugOff()
 PennController.AddHost("https://raw.githubusercontent.com/awpzs/RC_ENG_Priming_RC/master/audio/")
 PennController.AddHost("https://raw.githubusercontent.com/awpzs/RC_ENG_Priming_RC/master/images/")
 
-Sequence( "initRecorder", "mic_check_1", "mic_check_2", "prac" ) //for checking prac only
+//Sequence( "initRecorder", "mic_check_1", "mic_check_2", "prac" ) //for checking prac only
 //Sequence( "initRecorder", "exp_start", "exp_block1", "rest", "exp_block2", "final" ) //for checking lists only
-//Sequence( "initRecorder", "mic_check_1", "mic_check_2", "setcounter", "information", "survey", "identification", "recording_information", "instruction", "prac", "exp_start", "exp_block1", "rest", "exp_block2", "send", "final" )
+Sequence( "initRecorder", "mic_check_1", "mic_check_2", "setcounter", "information", "survey", "identification", "recording_information", "instruction", "prac", "exp_start", "exp_block1", "rest", "exp_block2", "send", "final" )
 
-InitiateRecorder("https://localhost/pcibex/index.php", "This experiment involves audio recording, so let us first test if your microphone is working. <strong>In the following microphone test, you’ll be asked to name aloud two images, while your responses are audio recorded.</strong> Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
-//InitiateRecorder("https://langprolab.stir.ac.uk/pcibex/index.php", "This experiment involves audio recording, so let us first test if your microphone is working. <strong>In the following microphone test, you’ll be asked to name aloud two images, while your responses are audio recorded.</strong> Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
+//InitiateRecorder("https://localhost/pcibex/index.php", "<p>Thank you very much for your interest in participating in this study.</p><p>This experiment involves audio recording, so let us first test if your microphone is working.</p><p><strong>In the following microphone test, you’ll be asked to name aloud two images, while your responses are audio recorded.</strong></p><p>Please grant expt.pcibex.net access to your microphone, by clicking on the link below.</p><p><strong>The recording will start immediately, and you’ll be prompted to name an image aloud.</strong></p><p><strong>You will be able to listen to your response by clicking on “Playback”.</strong></p>").label("initRecorder")
+InitiateRecorder("https://langprolab.stir.ac.uk/pcibex/index.php", "<p>Thank you very much for your interest in participating in this study.</p><p>This experiment involves audio recording, so let us first test if your microphone is working.</p><p><strong>In the following microphone test, you’ll be asked to name aloud two images, while your responses are audio recorded.</strong></p><p>Please grant expt.pcibex.net access to your microphone, by clicking on the link below.</p><p><strong>The recording will start immediately, and you’ll be prompted to name an image aloud.</strong></p><p><strong>You will be able to listen to your response by clicking on “Playback”.</strong></p>").label("initRecorder")
 
 newTrial("mic_check_1",
     newMediaRecorder("recorder", "audio")
@@ -19,7 +19,7 @@ newTrial("mic_check_1",
         .settings.center()
         .print()
     ,
-    newText("<p>Please name this image aloud and press “Continue”.</p>")
+    newText("<p>Please name this image aloud and press “Playback”.</p>")
         .settings.center()
         .print()
     ,
@@ -27,9 +27,13 @@ newTrial("mic_check_1",
         .settings.center()
         .print()
     ,
-    newButton("Continue")
+    newButton("Playback")
         .settings.center()
         .print()
+        .wait()
+    ,
+    newTimer("wait", 1500)
+        .start()
         .wait()
     ,
     getMediaRecorder("recorder")
@@ -61,7 +65,7 @@ newTrial("mic_check_2",
         .settings.center()
         .print()
     ,
-    newText("<p>Please name this image and press “Continue”.</p>")
+    newText("<p>Please name this image and press “Playback”.</p>")
         .settings.center()
         .print()
     ,
@@ -69,9 +73,13 @@ newTrial("mic_check_2",
         .settings.center()
         .print()
     ,
-    newButton("Continue")
+    newButton("Playback")
         .settings.center()
         .print()
+        .wait()
+    ,
+    newTimer("wait", 1500)
+        .start()
         .wait()
     ,
     getMediaRecorder("recorder")
@@ -85,7 +93,7 @@ newTrial("mic_check_2",
         .settings.center()
         .print()
     ,
-    newText("<p>If you clearly heard what you said, click on “Continue” to proceed.</p><p><strong>If you could not clearly hear what you said, then you cannot take part in this study, as we cannot record your responses.</strong></p><p>Please quit this experiment now, by clicking on the X on the “Experiment” page tab. Thank you very much for your interest in this study.</p>")
+    newText("<p>If you clearly heard what you said, click on “Continue” to proceed. This will take you to the information sheet of this study.</p><p><strong>If you could not clearly hear what you said, then you cannot take part in this study, as we cannot record your responses.</strong></p><p>Please quit this experiment now, by clicking on the X on the “Experiment” page tab. Thank you very much for your interest in this study.</p>")
         .print()
     ,
     newButton("cont", "Continue")
@@ -154,7 +162,7 @@ newTrial("recording_information" ,
 
 Template(
     GetTable("instructions.csv")
-            .setGroupColumn("list")//.filter( variable => variable.list == 3 ) 
+            .setGroupColumn("list").filter( variable => variable.list == 1 ) 
             , variable =>
             newTrial( "instruction" ,
                 newHtml("information", variable.insPage)
@@ -169,9 +177,21 @@ Template(
   .log( "ID"     , GetURLParameter("id")    )
 )
 
+newTrial("prac_start",
+        newText("<p>We now proceed to the experiment.</p><p>From now on, you won’t be able to playback your responses.</p><p>Please press “Continue” to proceed.</p>")
+            .settings.center()
+            .print()
+        ,
+        newButton("Continue")
+            .settings.center()
+            .print()
+            .wait()
+        
+)
+
 Template(
     GetTable("prac.csv")
-            .setGroupColumn("list")//.filter( variable => variable.list == 3 ) 
+            .setGroupColumn("list").filter( variable => variable.list == 1 ) 
             , variable =>
     newTrial( "prac" ,
             newText("prac_item", variable.item)
@@ -310,13 +330,8 @@ Template(
                 .start()
                 .wait()
             ,
-            getText("prac_item").test.text("p1")
-                .success(getMediaRecorder("recorder")
-                            .stop()
-                            .play()
-                            .wait("playback"))
-                .failure(getMediaRecorder("recorder")
-                            .stop())
+            getMediaRecorder("recorder")
+                .stop()
             ,
             getMediaRecorder("recorder").test.recorded()
                 .failure(newText("Sorry, there seems to be something wrong with your microphone. Please stop the experiment, and contact the researcher.").settings.center().print())
@@ -324,10 +339,7 @@ Template(
             clear()
             ,
             getText("prac_item").test.text("p1")
-                .success(newText("You should have heard what you said - if you haven’t, then please terminate your participation by closing the browser, as we cannot record your responses and your participation will be invalid.")
-                                .print()
-                            ,
-                            newText("When describing the object in the box, you may say ")
+                .success(newText("You may say ")
                                 .settings.after(newText(variable.targetRC1).bold())
                                 .settings.after(newText(",&nbsp;"))
                                 .settings.after(newText(variable.targetRC2).bold())
@@ -377,7 +389,7 @@ Template(
 Template(
     GetTable("fulldesign.csv")
             .setGroupColumn("list").filter(variable => variable.order < 44)
-            //.filter( variable => variable.list == 3 ) 
+            .filter( variable => variable.list == 1 ) 
             , variable =>
     		newTrial( "exp_block1" ,
             	newText("exp_item", variable.item)
@@ -534,7 +546,7 @@ newTrial( "rest" ,
 Template(
     GetTable("fulldesign.csv")
             .setGroupColumn("list").filter(variable => variable.order > 43)
-            //.filter( variable => variable.list == 3 ) 
+            .filter( variable => variable.list == 1 ) 
             , variable =>
     		newTrial( "exp_block2" ,
             	newText("exp_item", variable.item)
