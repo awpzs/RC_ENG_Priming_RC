@@ -4,26 +4,26 @@ PennController.DebugOff()
 PennController.AddHost("https://raw.githubusercontent.com/awpzs/RC_ENG_Priming_RC/master/audio/")
 PennController.AddHost("https://raw.githubusercontent.com/awpzs/RC_ENG_Priming_RC/master/images/")
 
-//Sequence( "initRecorder", "mic_check", "prac" ) //for checking prac only
+Sequence( "initRecorder", "mic_check_1", "mic_check_2", "prac" ) //for checking prac only
 //Sequence( "initRecorder", "exp_start", "exp_block1", "rest", "exp_block2", "final" ) //for checking lists only
-Sequence( "initRecorder", "mic_check", "setcounter", "information", "survey", "identification", "recording_information", "instruction", "prac", "exp_start", "exp_block1", "rest", "exp_block2", "send", "final" )
+//Sequence( "initRecorder", "mic_check_1", "mic_check_2", "setcounter", "information", "survey", "identification", "recording_information", "instruction", "prac", "exp_start", "exp_block1", "rest", "exp_block2", "send", "final" )
 
-//InitiateRecorder("https://localhost/pcibex/index.php", "This experiment involves audio recording. Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
-InitiateRecorder("https://langprolab.stir.ac.uk/pcibex/index.php", "This experiment involves audio recording. Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
+InitiateRecorder("https://localhost/pcibex/index.php", "This experiment involves audio recording, so let us first test if your microphone is working. <strong>In the following microphone test, you’ll be asked to name aloud two images, while your responses are audio recorded.</strong> Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
+//InitiateRecorder("https://langprolab.stir.ac.uk/pcibex/index.php", "This experiment involves audio recording, so let us first test if your microphone is working. <strong>In the following microphone test, you’ll be asked to name aloud two images, while your responses are audio recorded.</strong> Please grant expt.pcibex.net access to your microphone.").label("initRecorder")
 
-newTrial("mic_check",
+newTrial("mic_check_1",
     newMediaRecorder("recorder", "audio")
         .record()
     ,
-    newText("<p>Before starting, could we please check if we can record your responses?  Please name this image:</p>")
+    newText("<p><strong>Microphone check 1</strong></p>")
+        .settings.center()
+        .print()
+    ,
+    newText("<p>Please name this image aloud and press “Continue”.</p>")
         .settings.center()
         .print()
     ,
     newImage("apple", "apple.png")
-        .settings.center()
-        .print()
-    ,
-    newText("<p>When you finished naming the image, please click on <strong>Continue</strong> to proceed.</p>")
         .settings.center()
         .print()
     ,
@@ -39,13 +39,56 @@ newTrial("mic_check",
     ,
     clear()
     ,
-    newText("<p>You should have heard what you've just said.</p><p>If you haven’t been able to hear what you said, then we are not able to record your responses.</p><p>Please could you close this page now and thank you very much for your interest in this study.</p>")
+    newText("<p><strong>Microphone check 1</strong></p>")
+        .settings.center()
         .print()
     ,
-    newText("<p>If your microphone is working well, please click on <strong>Continue</strong> to proceed.</p>")
+    newText("<p>If you clearly heard what you said, click on “Continue” to proceed.</p><p>If you could not clearly hear what you said, please check your microphone (e.g., checking Device in Settings), then click on “Continue”.</p>")
+        .print()
+    ,
+    newButton("cont", "Continue")
+        .settings.center()
+        .print()
+        .wait()
+)
+.log( "ID", PennController.GetURLParameter("id") )
+
+newTrial("mic_check_2",
+    newMediaRecorder("recorder", "audio")
+        .record()
+    ,
+    newText("<p><strong>Microphone check 2</strong></p>")
+        .settings.center()
+        .print()
+    ,
+    newText("<p>Please name this image and press “Continue”.</p>")
+        .settings.center()
+        .print()
+    ,
+    newImage("pineapple", "pineapple.png")
+        .settings.center()
         .print()
     ,
     newButton("Continue")
+        .settings.center()
+        .print()
+        .wait()
+    ,
+    getMediaRecorder("recorder")
+        .stop()
+        .play()
+        .wait("playback")
+    ,
+    clear()
+    ,
+    newText("<p><strong>Microphone check 2</strong></p>")
+        .settings.center()
+        .print()
+    ,
+    newText("<p>If you clearly heard what you said, click on “Continue” to proceed.</p><p><strong>If you could not clearly hear what you said, then you cannot take part in this study, as we cannot record your responses.</strong></p><p>Please quit this experiment now, by clicking on the X on the “Experiment” page tab. Thank you very much for your interest in this study.</p>")
+        .print()
+    ,
+    newButton("cont", "Continue")
         .settings.center()
         .print()
         .wait()
